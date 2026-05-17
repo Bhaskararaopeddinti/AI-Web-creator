@@ -1,0 +1,136 @@
+Create a production-level AI-powered web application called “Smart Campus GatePass System” that digitally manages student outgoing and incoming records for colleges, universities, and hostels.
+
+The application should have a modern responsive UI, secure authentication, role-based dashboards, QR-code gate passes, real-time tracking, analytics, notifications, and AI-powered insights.
+
+Main Modules
+Student Portal
+Warden Dashboard
+Security Guard Dashboard
+Admin Panel
+Student Features
+Student registration/login
+Apply for outing/gate pass
+Select outing type:
+Home Visit
+Weekend Leave
+Emergency Leave
+Medical Leave
+Enter reason, destination, outgoing time, expected return time
+Upload documents if needed
+Track request status:
+Pending
+Approved
+Rejected
+Digital QR-based gate pass
+Outing history
+Notifications and alerts
+Mobile responsive dashboard
+Dark/light mode
+Warden Features
+Approve/reject student requests
+Add remarks
+View student history
+View students currently outside campus
+Late-return alerts
+Search and filter functionality
+Export reports to PDF/Excel
+Analytics dashboard
+Security Guard Features
+QR code scanner
+Verify approved passes
+Mark outgoing/incoming
+Auto timestamp entry
+Detect expired/fake QR codes
+Capture entry/exit logs
+Admin Features
+Manage students, wardens, departments, hostels
+Full analytics dashboard
+Charts and reports
+System logs
+Role management
+Database backup
+Activity monitoring
+AI-powered suspicious activity detection
+Advanced Features
+Real-time notifications using Socket.io
+Email/SMS alerts to parents
+AI chatbot assistant
+Face verification support
+GPS tracking (optional)
+Geo-fencing support
+Live count of students outside campus
+Audit logs
+Multi-campus support
+UI/UX Requirements
+Modern SaaS-style dashboard
+Glassmorphism design
+Smooth animations
+Sidebar navigation
+Dashboard cards
+Charts and graphs
+Fully responsive mobile-first design
+Professional color palette
+Loading animations and skeletons
+Tech Stack
+
+Frontend:
+
+Next.js / React.js
+Tailwind CSS
+Framer Motion
+
+Backend:
+
+Node.js + Express.js
+
+Database:
+
+MongoDB
+
+Authentication:
+
+JWT + bcrypt
+
+Integrations:
+
+QR Code Generator
+Cloudinary for uploads
+Socket.io
+Email/SMS API
+Required Pages
+Landing Page
+Login/Register
+Student Dashboard
+Warden Dashboard
+Security Dashboard
+Admin Dashboard
+Outing Request Form
+Reports Page
+Analytics Page
+Notifications Center
+Settings Page
+Backend Requirements
+REST API architecture
+Clean folder structure
+Secure authentication
+Form validation
+Error handling
+Environment variables
+Reusable components
+Deployment-ready code
+Final Output
+
+Generate:
+
+Complete frontend
+Complete backend
+MongoDB schema
+API routes
+Authentication system
+QR-code system
+Real-time notification system
+Admin analytics dashboard
+Professional responsive UI
+Deployment instructions
+
+Build the application like a real enterprise SaaS product used by universities and hostel management systems.

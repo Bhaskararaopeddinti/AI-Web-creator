@@ -3,20 +3,36 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Smart Campus GatePass System API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: gate-passes
+    description: Gate pass management
+  - name: users
+    description: User management
+  - name: hostels
+    description: Hostel management
+  - name: departments
+    description: Department management
+  - name: notifications
+    description: Notifications
+  - name: analytics
+    description: Analytics and reporting
+  - name: gate-logs
+    description: Gate entry/exit logs
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +40,591 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: Registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid input
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  /gate-passes:
+    get:
+      operationId: listGatePasses
+      tags: [gate-passes]
+      summary: List gate passes (filtered by role)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected, out, returned]
+        - name: studentId
+          in: query
+          schema:
+            type: integer
+        - name: hostelId
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: List of gate passes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GatePassListResponse"
+    post:
+      operationId: createGatePass
+      tags: [gate-passes]
+      summary: Apply for a gate pass (student)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GatePassInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GatePass"
+
+  /gate-passes/{id}:
+    get:
+      operationId: getGatePass
+      tags: [gate-passes]
+      summary: Get a gate pass by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Gate pass
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GatePass"
+        "404":
+          description: Not found
+
+  /gate-passes/{id}/status:
+    patch:
+      operationId: updateGatePassStatus
+      tags: [gate-passes]
+      summary: Approve or reject a gate pass (warden)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GatePassStatusUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GatePass"
+
+  /gate-passes/{id}/mark-out:
+    patch:
+      operationId: markGatePassOut
+      tags: [gate-passes]
+      summary: Mark student as exited campus (security)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Marked out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GatePass"
+
+  /gate-passes/{id}/mark-in:
+    patch:
+      operationId: markGatePassIn
+      tags: [gate-passes]
+      summary: Mark student as returned to campus (security)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Marked in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GatePass"
+
+  /gate-passes/{id}/qr:
+    get:
+      operationId: getGatePassQr
+      tags: [gate-passes]
+      summary: Get QR code data for a gate pass
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: QR code data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QrCodeResponse"
+
+  /gate-passes/verify/{token}:
+    get:
+      operationId: verifyGatePass
+      tags: [gate-passes]
+      summary: Verify a gate pass by QR token (security)
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Valid pass
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GatePass"
+        "404":
+          description: Invalid or expired
+
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all users (admin)
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [student, warden, security, admin]
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: hostelId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Create a user (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get a user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateUser
+      tags: [users]
+      summary: Update a user (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    delete:
+      operationId: deleteUser
+      tags: [users]
+      summary: Delete a user (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /hostels:
+    get:
+      operationId: listHostels
+      tags: [hostels]
+      summary: List all hostels
+      responses:
+        "200":
+          description: List of hostels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Hostel"
+    post:
+      operationId: createHostel
+      tags: [hostels]
+      summary: Create a hostel (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HostelInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hostel"
+
+  /hostels/{id}:
+    patch:
+      operationId: updateHostel
+      tags: [hostels]
+      summary: Update a hostel (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HostelUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hostel"
+    delete:
+      operationId: deleteHostel
+      tags: [hostels]
+      summary: Delete a hostel (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /departments:
+    get:
+      operationId: listDepartments
+      tags: [departments]
+      summary: List all departments
+      responses:
+        "200":
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Department"
+    post:
+      operationId: createDepartment
+      tags: [departments]
+      summary: Create a department (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DepartmentInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+
+  /departments/{id}:
+    delete:
+      operationId: deleteDepartment
+      tags: [departments]
+      summary: Delete a department (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [notifications]
+      summary: List notifications for current user
+      responses:
+        "200":
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+
+  /notifications/{id}/read:
+    patch:
+      operationId: markNotificationRead
+      tags: [notifications]
+      summary: Mark a notification as read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Marked as read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+
+  /notifications/read-all:
+    patch:
+      operationId: markAllNotificationsRead
+      tags: [notifications]
+      summary: Mark all notifications as read
+      responses:
+        "200":
+          description: All marked as read
+
+  /analytics/summary:
+    get:
+      operationId: getAnalyticsSummary
+      tags: [analytics]
+      summary: Get analytics summary (admin/warden)
+      responses:
+        "200":
+          description: Analytics summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsSummary"
+
+  /analytics/live-count:
+    get:
+      operationId: getLiveCount
+      tags: [analytics]
+      summary: Get live count of students currently outside
+      responses:
+        "200":
+          description: Live count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LiveCount"
+
+  /analytics/outing-stats:
+    get:
+      operationId: getOutingStats
+      tags: [analytics]
+      summary: Get outing statistics by type and status
+      responses:
+        "200":
+          description: Outing stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutingStats"
+
+  /gate-logs:
+    get:
+      operationId: listGateLogs
+      tags: [gate-logs]
+      summary: List gate entry/exit logs
+      parameters:
+        - name: studentId
+          in: query
+          schema:
+            type: integer
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [in, out]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: List of gate logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GateLog"
+
+  /ai/insights:
+    get:
+      operationId: getAiInsights
+      tags: [analytics]
+      summary: Get AI-powered insights and suspicious activity flags
+      responses:
+        "200":
+          description: AI insights
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiInsights"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +632,471 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    RegisterInput:
+      type: object
+      required: [name, email, password, role]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        role:
+          type: string
+          enum: [student, warden, security, admin]
+        rollNumber:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        hostelId:
+          type: ["integer", "null"]
+        departmentId:
+          type: ["integer", "null"]
+        roomNumber:
+          type: ["string", "null"]
+        parentPhone:
+          type: ["string", "null"]
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    User:
+      type: object
+      required: [id, name, email, role, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [student, warden, security, admin]
+        rollNumber:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        roomNumber:
+          type: ["string", "null"]
+        parentPhone:
+          type: ["string", "null"]
+        hostelId:
+          type: ["integer", "null"]
+        hostelName:
+          type: ["string", "null"]
+        departmentId:
+          type: ["integer", "null"]
+        departmentName:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    UserInput:
+      type: object
+      required: [name, email, password, role]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [student, warden, security, admin]
+        rollNumber:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        hostelId:
+          type: ["integer", "null"]
+        departmentId:
+          type: ["integer", "null"]
+        roomNumber:
+          type: ["string", "null"]
+        parentPhone:
+          type: ["string", "null"]
+
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        hostelId:
+          type: ["integer", "null"]
+        departmentId:
+          type: ["integer", "null"]
+        roomNumber:
+          type: ["string", "null"]
+        parentPhone:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+
+    GatePass:
+      type: object
+      required: [id, studentId, outingType, reason, destination, outgoingTime, expectedReturnTime, status, createdAt]
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        studentName:
+          type: ["string", "null"]
+        studentRollNumber:
+          type: ["string", "null"]
+        hostelName:
+          type: ["string", "null"]
+        roomNumber:
+          type: ["string", "null"]
+        outingType:
+          type: string
+          enum: [home_visit, weekend_leave, emergency_leave, medical_leave]
+        reason:
+          type: string
+        destination:
+          type: string
+        outgoingTime:
+          type: string
+          format: date-time
+        expectedReturnTime:
+          type: string
+          format: date-time
+        actualOutTime:
+          type: ["string", "null"]
+          format: date-time
+        actualInTime:
+          type: ["string", "null"]
+          format: date-time
+        status:
+          type: string
+          enum: [pending, approved, rejected, out, returned]
+        wardenRemarks:
+          type: ["string", "null"]
+        approvedById:
+          type: ["integer", "null"]
+        approvedByName:
+          type: ["string", "null"]
+        qrToken:
+          type: ["string", "null"]
+        isLate:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    GatePassInput:
+      type: object
+      required: [outingType, reason, destination, outgoingTime, expectedReturnTime]
+      properties:
+        outingType:
+          type: string
+          enum: [home_visit, weekend_leave, emergency_leave, medical_leave]
+        reason:
+          type: string
+        destination:
+          type: string
+        outgoingTime:
+          type: string
+          format: date-time
+        expectedReturnTime:
+          type: string
+          format: date-time
+
+    GatePassStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [approved, rejected]
+        wardenRemarks:
+          type: ["string", "null"]
+
+    GatePassListResponse:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/GatePass"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    QrCodeResponse:
+      type: object
+      required: [qrDataUrl, token]
+      properties:
+        qrDataUrl:
+          type: string
+        token:
+          type: string
+
+    Hostel:
+      type: object
+      required: [id, name, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        totalRooms:
+          type: ["integer", "null"]
+        wardenId:
+          type: ["integer", "null"]
+        wardenName:
+          type: ["string", "null"]
+        studentCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    HostelInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        totalRooms:
+          type: ["integer", "null"]
+        wardenId:
+          type: ["integer", "null"]
+
+    HostelUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        totalRooms:
+          type: ["integer", "null"]
+        wardenId:
+          type: ["integer", "null"]
+
+    Department:
+      type: object
+      required: [id, name, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        studentCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    DepartmentInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+
+    Notification:
+      type: object
+      required: [id, userId, title, message, type, isRead, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        title:
+          type: string
+        message:
+          type: string
+        type:
+          type: string
+          enum: [gate_pass_approved, gate_pass_rejected, gate_pass_applied, late_return, general]
+        isRead:
+          type: boolean
+        gatePassId:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    GateLog:
+      type: object
+      required: [id, gatePassId, studentId, type, timestamp]
+      properties:
+        id:
+          type: integer
+        gatePassId:
+          type: integer
+        studentId:
+          type: integer
+        studentName:
+          type: ["string", "null"]
+        studentRollNumber:
+          type: ["string", "null"]
+        type:
+          type: string
+          enum: [in, out]
+        timestamp:
+          type: string
+          format: date-time
+        guardId:
+          type: ["integer", "null"]
+        guardName:
+          type: ["string", "null"]
+
+    AnalyticsSummary:
+      type: object
+      required: [totalStudents, totalPasses, pendingPasses, approvedPasses, rejectedPasses, currentlyOutside, lateReturns, todayPasses]
+      properties:
+        totalStudents:
+          type: integer
+        totalPasses:
+          type: integer
+        pendingPasses:
+          type: integer
+        approvedPasses:
+          type: integer
+        rejectedPasses:
+          type: integer
+        currentlyOutside:
+          type: integer
+        lateReturns:
+          type: integer
+        todayPasses:
+          type: integer
+        passTypeBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/PassTypeCount"
+        weeklyTrend:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyCount"
+
+    LiveCount:
+      type: object
+      required: [count, students]
+      properties:
+        count:
+          type: integer
+        students:
+          type: array
+          items:
+            $ref: "#/components/schemas/GatePass"
+
+    OutingStats:
+      type: object
+      required: [byType, byStatus, byHostel, monthlyTrend]
+      properties:
+        byType:
+          type: array
+          items:
+            $ref: "#/components/schemas/PassTypeCount"
+        byStatus:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatusCount"
+        byHostel:
+          type: array
+          items:
+            $ref: "#/components/schemas/HostelCount"
+        monthlyTrend:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyCount"
+
+    PassTypeCount:
+      type: object
+      required: [type, count]
+      properties:
+        type:
+          type: string
+        count:
+          type: integer
+
+    StatusCount:
+      type: object
+      required: [status, count]
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+
+    HostelCount:
+      type: object
+      required: [hostelId, hostelName, count]
+      properties:
+        hostelId:
+          type: integer
+        hostelName:
+          type: string
+        count:
+          type: integer
+
+    DailyCount:
+      type: object
+      required: [date, count]
+      properties:
+        date:
+          type: string
+        count:
+          type: integer
+
+    AiInsights:
+      type: object
+      required: [insights, suspiciousFlags, recommendations]
+      properties:
+        insights:
+          type: string
+        suspiciousFlags:
+          type: array
+          items:
+            $ref: "#/components/schemas/SuspiciousFlag"
+        recommendations:
+          type: array
+          items:
+            type: string
+
+    SuspiciousFlag:
+      type: object
+      required: [studentId, studentName, reason, severity]
+      properties:
+        studentId:
+          type: integer
+        studentName:
+          type: string
+        reason:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high]
