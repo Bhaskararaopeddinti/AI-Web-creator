@@ -27,15 +27,16 @@ const roleIcons: Record<string, React.ElementType> = {
 };
 
 export default function AdminUsers() {
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("all");
   const [search, setSearch] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const deleteUser = useDeleteUser();
 
+  const roleParam = role !== "all" ? role as any : undefined;
   const { data: users, isLoading } = useListUsers(
-    { role: role as any || undefined, search: search || undefined },
-    { query: { queryKey: getListUsersQueryKey({ role: role as any || undefined, search: search || undefined }) } }
+    { role: roleParam, search: search || undefined },
+    { query: { queryKey: getListUsersQueryKey({ role: roleParam, search: search || undefined }) } }
   );
 
   const handleDelete = (id: number, name: string) => {
@@ -65,7 +66,7 @@ export default function AdminUsers() {
           <Select value={role} onValueChange={setRole}>
             <SelectTrigger className="w-40"><SelectValue placeholder="All Roles" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Roles</SelectItem>
+              <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="student">Students</SelectItem>
               <SelectItem value="warden">Wardens</SelectItem>
               <SelectItem value="security">Security</SelectItem>

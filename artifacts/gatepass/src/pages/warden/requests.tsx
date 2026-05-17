@@ -33,9 +33,10 @@ export default function WardenRequests() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  const statusParam = status !== "all" ? status as any : undefined;
   const { data, isLoading } = useListGatePasses(
-    { status: status as any || undefined, search: search || undefined },
-    { query: { queryKey: getListGatePassesQueryKey({ status: status as any || undefined, search: search || undefined }) } }
+    { status: statusParam, search: search || undefined },
+    { query: { queryKey: getListGatePassesQueryKey({ status: statusParam, search: search || undefined }) } }
   );
   const updateStatus = useUpdateGatePassStatus();
   const passes = data?.data ?? [];
@@ -68,7 +69,7 @@ export default function WardenRequests() {
           <Select value={status} onValueChange={setStatus}>
             <SelectTrigger className="w-40"><SelectValue placeholder="All Status" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All</SelectItem>
+              <SelectItem value="all">All</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>

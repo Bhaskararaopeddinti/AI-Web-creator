@@ -26,9 +26,10 @@ export default function WardenHistory() {
   const [status, setStatus] = useState("returned");
   const [search, setSearch] = useState("");
 
+  const statusParam = status !== "all" ? status as any : undefined;
   const { data, isLoading } = useListGatePasses(
-    { status: status as any || undefined, search: search || undefined },
-    { query: { queryKey: getListGatePassesQueryKey({ status: status as any || undefined, search: search || undefined }) } }
+    { status: statusParam, search: search || undefined },
+    { query: { queryKey: getListGatePassesQueryKey({ status: statusParam, search: search || undefined }) } }
   );
 
   const passes = data?.data ?? [];
@@ -49,7 +50,7 @@ export default function WardenHistory() {
           <Select value={status} onValueChange={setStatus}>
             <SelectTrigger className="w-40"><SelectValue placeholder="All Status" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All</SelectItem>
+              <SelectItem value="all">All</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>

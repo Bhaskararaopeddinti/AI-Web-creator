@@ -27,11 +27,12 @@ const outingLabels: Record<string, string> = {
 };
 
 export default function StudentPasses() {
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState("all");
   const [search, setSearch] = useState("");
+  const statusParam = status !== "all" ? status as any : undefined;
   const { data, isLoading } = useListGatePasses(
-    { status: status as any || undefined, search: search || undefined },
-    { query: { queryKey: getListGatePassesQueryKey({ status: status as any || undefined, search: search || undefined }) } }
+    { status: statusParam, search: search || undefined },
+    { query: { queryKey: getListGatePassesQueryKey({ status: statusParam, search: search || undefined }) } }
   );
 
   const passes = data?.data ?? [];
@@ -52,7 +53,7 @@ export default function StudentPasses() {
           <Select value={status} onValueChange={setStatus}>
             <SelectTrigger className="w-40" data-testid="select-status-filter"><SelectValue placeholder="All Status" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Status</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
