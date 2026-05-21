@@ -2,12 +2,11 @@ import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRegister, useListHostels, useListDepartments } from "@workspace/api-client-react";
+import { useRegister } from "@workspace/api-client-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Shield } from "lucide-react";
@@ -18,8 +17,8 @@ const registerSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   rollNumber: z.string().min(1, "Roll number is required"),
   phone: z.string().min(10, "Valid phone number required"),
-  hostelId: z.string().min(1, "Please select a hostel"),
-  departmentId: z.string().min(1, "Please select a department"),
+  hostelName: z.string().min(2, "Hostel name is required"),
+  departmentName: z.string().min(2, "Department name is required"),
   roomNumber: z.string().min(1, "Room number is required"),
   parentPhone: z.string().min(10, "Parent phone number required"),
 });
@@ -29,17 +28,15 @@ export default function Register() {
   const { login } = useAuth();
   const { toast } = useToast();
   const registerMutation = useRegister();
-  const { data: hostels } = useListHostels();
-  const { data: departments } = useListDepartments();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: "", email: "", password: "", rollNumber: "", phone: "", hostelId: "", departmentId: "", roomNumber: "", parentPhone: "" },
+    defaultValues: { name: "", email: "", password: "", rollNumber: "", phone: "", hostelName: "", departmentName: "", roomNumber: "", parentPhone: "" },
   });
 
   const onSubmit = (data: z.infer<typeof registerSchema>) => {
     registerMutation.mutate(
-      { data: { ...data, role: "student", hostelId: parseInt(data.hostelId, 10), departmentId: parseInt(data.departmentId, 10) } },
+      { data: { ...data, role: "student" } },
       {
         onSuccess: (res) => { login(res.token, res.user); setLocation("/student"); },
         onError: (err: any) => { toast({ title: "Registration Failed", description: err?.data?.error || "Something went wrong", variant: "destructive" }); },
@@ -102,27 +99,17 @@ export default function Register() {
                       <FormMessage />
                     </FormItem>
                   )} />
-                  <FormField control={form.control} name="hostelId" render={({ field }) => (
+                  <FormField control={form.control} name="hostelName" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Hostel</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Select hostel" /></SelectTrigger></FormControl>
-                        <SelectContent>
-                          {hostels?.map((h) => <SelectItem key={h.id} value={String(h.id)}>{h.name}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
+                      <FormControl><Input placeholder="Enter hostel name manually" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
-                  <FormField control={form.control} name="departmentId" render={({ field }) => (
+                  <FormField control={form.control} name="departmentName" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Department</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Select dept" /></SelectTrigger></FormControl>
-                        <SelectContent>
-                          {departments?.map((d) => <SelectItem key={d.id} value={String(d.id)}>{d.name}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
+                      <FormControl><Input placeholder="Enter department name manually" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
