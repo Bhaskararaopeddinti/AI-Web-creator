@@ -119,6 +119,14 @@ router.post("/gate-passes", requireAuth, requireRole("student"), async (req, res
     );
   }
 
+  await db.insert(notificationsTable).values({
+    userId: req.user!.id,
+    title: "Gate Pass Request Submitted",
+    message: "Your gate pass request has been submitted and sent to the warden.",
+    type: "gate_pass_applied",
+    gatePassId: gp.id,
+  });
+
   res.status(201).json(await enrichGatePass(gp));
 });
 
@@ -201,6 +209,19 @@ router.patch("/gate-passes/:id/status", requireAuth, requireRole("warden", "admi
     type: parsed.data.status === "approved" ? "gate_pass_approved" : "gate_pass_rejected",
     gatePassId: gp.id,
   });
+
+  const wardens = await db.select().from(usersTable).where(eq(usersTable.role, "warden"));
+  if (wardens.length > 0) {
+    await db.insert(notificationsTable).values(
+      wardens.map(w => ({
+        userId: w.id,
+        title: "Gate Pass Status Updated",
+        message: `A gate pass for ${gp.id} was ${parsed.data.status}.`,
+        type: "general" as const,
+        gatePassId: gp.id,
+      }))
+    );
+  }
 
   res.json(await enrichGatePass(gp));
 });

@@ -57,7 +57,7 @@ export default function AdminDepartments() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Departments</h1>
-            <p className="text-muted-foreground text-sm mt-1">Manage academic departments</p>
+            <p className="text-muted-foreground text-sm mt-1">Manually add and manage academic departments</p>
           </div>
           <Button onClick={() => setShowForm(!showForm)} data-testid="button-add-department">
             {showForm ? <X className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
@@ -67,7 +67,7 @@ export default function AdminDepartments() {
 
         {showForm && (
           <Card>
-            <CardHeader><CardTitle className="text-base">Add New Department</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">Manually Add New Department</CardTitle></CardHeader>
             <CardContent>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-3 items-end">

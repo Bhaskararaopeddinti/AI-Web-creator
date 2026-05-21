@@ -60,7 +60,7 @@ export default function AdminHostels() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Hostels</h1>
-            <p className="text-muted-foreground text-sm mt-1">Manage hostel buildings</p>
+            <p className="text-muted-foreground text-sm mt-1">Manually add and manage hostel buildings</p>
           </div>
           <Button onClick={() => setShowForm(!showForm)} data-testid="button-add-hostel">
             {showForm ? <X className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
@@ -70,7 +70,7 @@ export default function AdminHostels() {
 
         {showForm && (
           <Card>
-            <CardHeader><CardTitle className="text-base">Add New Hostel</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">Manually Add New Hostel</CardTitle></CardHeader>
             <CardContent>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-3 items-end">
