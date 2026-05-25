@@ -410,31 +410,11 @@ export default function AdminUsers() {
                           {user.email}
                         </div>
 
-                        {/* Registration Number */}
-                        {user.registrationNumber && (
+                        {/* Roll Number */}
+                        {user.rollNumber && (
                           <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-
                             <IdCard className="w-3 h-3" />
-
-                            Registration No:
-                            {
-                              user.registrationNumber
-                            }
-
-                          </div>
-                        )}
-
-                        {/* College ID */}
-                        {user.collegeId && (
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-
-                            <IdCard className="w-3 h-3" />
-
-                            College ID:
-                            {
-                              user.collegeId
-                            }
-
+                            Roll No: {user.rollNumber}
                           </div>
                         )}
 
