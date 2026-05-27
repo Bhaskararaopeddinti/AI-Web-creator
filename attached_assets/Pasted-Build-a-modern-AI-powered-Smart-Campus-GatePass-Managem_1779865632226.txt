@@ -1,0 +1,180 @@
+Build a modern AI-powered Smart Campus GatePass Management System for colleges and hostels with a professional dark-themed admin dashboard.
+
+The application should manage:
+- Student outgoing/incoming records
+- Hostel management
+- Department management
+- QR-based gate pass verification
+- Role-based authentication
+- Real-time student tracking
+
+Main Roles:
+1. Admin
+2. Student
+3. Warden
+4. Security Guard
+
+-----------------------------------
+ADMIN FEATURES
+-----------------------------------
+
+Create a complete Admin Dashboard with:
+
+- Total students count
+- Active outings
+- Pending requests
+- Late return alerts
+- Live student tracking
+- Analytics charts
+- Notifications system
+- Reports export (PDF/Excel)
+
+Admin can:
+- Add/Edit/Delete students
+- Manage wardens
+- Manage security guards
+- Manage hostels
+- Manage departments
+- View all outing requests
+- Reset passwords
+- Control user roles
+- View system logs
+
+-----------------------------------
+STUDENT PROFILE FIELDS
+-----------------------------------
+
+Each student profile must include:
+
+- Full Name
+- Email
+- Registration Number
+- College ID
+- Roll Number
+- Parent Phone Number
+- Hostel Name
+- Department Name
+- Room Number
+- Profile Photo
+- User Role
+- Account Status
+
+-----------------------------------
+HOSTEL OPTIONS
+-----------------------------------
+
+Hostel dropdown should contain:
+
+- Boys Hostel
+- Girls Hostel
+- Other
+
+-----------------------------------
+DEPARTMENT OPTIONS
+-----------------------------------
+
+Department dropdown should contain:
+
+- CSE
+- ECE
+- CSM
+- CIC
+- IECT
+- EEE
+- MECH
+- CIVIL
+- DE
+- Other
+
+-----------------------------------
+WARDEN FEATURES
+-----------------------------------
+
+Wardens can:
+- Approve/reject outing requests
+- View student profiles
+- View parent numbers
+- Monitor hostel students
+- View late returns
+
+-----------------------------------
+SECURITY FEATURES
+-----------------------------------
+
+Security guards can:
+- Scan QR codes
+- Verify student details
+- View student profile
+- View hostel and department
+- Mark outgoing/incoming
+- Detect expired passes
+
+-----------------------------------
+UI/UX REQUIREMENTS
+-----------------------------------
+
+Design:
+- Modern SaaS dashboard
+- Dark theme
+- Glassmorphism UI
+- Responsive mobile-first design
+- Smooth animations
+- Sidebar navigation
+- Dashboard cards
+- Professional tables
+- Search and filters
+
+-----------------------------------
+TECH STACK
+-----------------------------------
+
+Frontend:
+- React.js / Next.js
+- Tailwind CSS
+- Framer Motion
+
+Backend:
+- Node.js + Express.js
+
+Database:
+- MongoDB
+
+Authentication:
+- JWT Authentication
+
+Integrations:
+- QR Code Generator
+- Cloudinary
+- Socket.io
+- Email Notifications
+
+-----------------------------------
+ADVANCED FEATURES
+-----------------------------------
+
+- AI insights dashboard
+- Late-return prediction
+- Emergency alerts
+- Real-time notifications
+- Export reports
+- Role-based access control
+- Secure API routes
+- Audit logs
+- Dark/light mode
+
+-----------------------------------
+FINAL OUTPUT
+-----------------------------------
+
+Generate:
+- Complete frontend
+- Complete backend
+- MongoDB schema
+- Admin dashboard
+- Student dashboard
+- Warden dashboard
+- Security dashboard
+- QR verification system
+- Authentication system
+- Responsive design
+- Deployment-ready production code
