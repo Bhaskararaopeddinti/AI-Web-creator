@@ -97,6 +97,7 @@ Campus Gate Pass System Analytics:
       recommendations = recLines.map(l => l.replace(/^\d+[\.\)]\s*/, "").replace(/\*\*/g, "").trim());
     } catch (aiErr) {
       req.log.warn({ err: aiErr }, "AI call failed, using fallback insights");
+
       insights = `Currently ${outPasses.length} student(s) are outside campus. ${lateStudents.length} student(s) have exceeded their expected return time. ${recentPasses.length} pass requests were made in the last 30 days.`;
       recommendations = [
         "Review all pending gate pass requests promptly to avoid delays",
